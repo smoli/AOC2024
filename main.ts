@@ -1,4 +1,6 @@
 import {argv} from "node:process";
+import { debounce } from "jsr:@std/async/debounce";
+import {readFileAsLineArray} from "./common/readFileAsLineArray.ts";
 
 function makeDayFolderName(day: number): string {
     return `./Day_${day}`;
@@ -16,7 +18,8 @@ async function runSolutionForDay(day: number, actual: boolean): Promise<{ a: any
     const r = {a: 0, b: 0}
 
     try {
-        const {solve1, solve2} = await import(makeDayPath(day, "solution.ts"));
+        const n = Math.floor(Math.random() * 1000000000);
+        const {solve1, solve2} = await import(makeDayPath(day, "solution.ts?v=" + n));
         r.a = await solve1(makeDayPath(day, input));
         r.b = await solve2(makeDayPath(day, input));
 
@@ -27,14 +30,77 @@ async function runSolutionForDay(day: number, actual: boolean): Promise<{ a: any
     return r;
 }
 
-
 async function run(day: number, actual: boolean) {
     const result = await runSolutionForDay(day, actual);
 
     console.group(`Day ${day}`);
     console.log("Puzzle 1: ", result.a);
     console.log("Puzzle 2: ", result.b);
+    console.groupEnd();
 }
+
+
+
+function compare(a: any, b: any): boolean {
+    if (typeof b === "string") {
+        return `${a}` === b;
+    }
+
+    if (typeof b === "number") {
+        return Number(a) === b;
+    }
+}
+
+async function watch(day: number, actual: boolean) {
+    const folder = makeDayFolderName(day);
+
+    const demoSolutionsFile = makeDayPath(day, "demoSolutions.txt");
+    const demoSolutions = (await readFileAsLineArray(demoSolutionsFile));
+
+    const demoInput = makeDayPath(day, "demo.txt");
+    const actualInput = makeDayPath(day, "actual.txt");
+
+    const watcher = Deno.watchFs(folder);
+
+    const debRun = debounce(async () => {
+        console.log("\nRerunning...\n\n");
+
+        let actual1 = false;
+        let actual2 = false;
+
+        const n = Math.floor(Math.random() * 1000000000);
+        const {solve1, solve2} = await import(makeDayPath(day, "solution.ts?v=" + n));
+
+        const demo1 = await solve1(demoInput);
+        const demo2 = await solve2(demoInput);
+        let result1 = demo1;
+        let result2 = demo2;
+
+        if (compare(demoSolutions[0], demo1)) {
+            result1 = await solve1(actualInput);
+            actual1 = true;
+        }
+
+        if (compare(demoSolutions[1], demo2)) {
+            result2 = await solve2(actualInput);
+            actual2 = true;
+        }
+
+        console.group(`Day ${day}`);
+        console.log("Puzzle 1:", result1, actual1 ? "(actual)" : "(demo)");
+        console.log("Puzzle 2:", result2, actual2 ? "(actual)" : "(demo)");
+        console.groupEnd();
+
+    }, 1000);
+
+
+    debRun();
+
+    for await (const event of watcher) {
+        await debRun(day, actual);
+    }
+}
+
 
 async function folderExists(path: string): Promise<boolean> {
     try {
@@ -69,6 +135,7 @@ function help() {
     console.log();
     console.log("c N\tcreate a new solution template for day N");
     console.log("r N (A)\trun solution for day N. If A is given any value the actual data will be used. Demo otherwise");
+    console.log("w N (A)\trun solution for day N everytime one of the files in the respective folder changes.");
     console.log();
 }
 
@@ -91,6 +158,12 @@ if (argv.length < 4) {
         case "R":
         case "run":
             await run(day, actual);
+            break;
+
+        case "w":
+        case "W":
+        case "watch":
+            await watch(day, actual);
             break;
 
 
