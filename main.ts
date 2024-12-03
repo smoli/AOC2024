@@ -112,7 +112,7 @@ async function folderExists(path: string): Promise<boolean> {
 }
 
 async function create(day: number) {
-    const files = ["actual.txt", "demo.txt", "solution.ts"];
+    const files = ["actual.txt", "demo.txt", "solution.ts", "solution.ts", "solution.test.ts"];
 
     if (await folderExists(makeDayFolderName(day))) {
         console.log(`Solution Folder for Day ${day} already exists. Doing nothing.`);
