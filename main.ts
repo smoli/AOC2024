@@ -31,7 +31,9 @@ async function runSolutionForDay(day: number, actual: boolean): Promise<{ a: any
 async function run(day: number, actual: boolean) {
     const result = await runSolutionForDay(day, actual);
 
-    console.log(result);
+    console.group(`Day ${day}`);
+    console.log("Puzzle 1: ", result.a);
+    console.log("Puzzle 2: ", result.b);
 }
 
 async function folderExists(path: string): Promise<boolean> {
