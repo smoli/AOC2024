@@ -1,5 +1,5 @@
 import {argv} from "node:process";
-import { debounce } from "jsr:@std/async/debounce";
+import {debounce} from "jsr:@std/async/debounce";
 import {readFileAsLineArray} from "./common/readFileAsLineArray.ts";
 
 function makeDayFolderName(day: number): string {
@@ -40,7 +40,6 @@ async function run(day: number, actual: boolean) {
 }
 
 
-
 function compare(a: any, b: any): boolean {
     if (typeof b === "string") {
         return `${a}` === b;
@@ -63,7 +62,10 @@ async function watch(day: number, actual: boolean) {
     const watcher = Deno.watchFs(folder);
 
     const debRun = debounce(async () => {
-        console.log("\nRerunning...\n\n");
+        console.group(`
+Rerunning Day ${day}
+===================================================================================
+`);
 
         let actual1 = false;
         let actual2 = false;
@@ -71,25 +73,32 @@ async function watch(day: number, actual: boolean) {
         const n = Math.floor(Math.random() * 1000000000);
         const {solve1, solve2} = await import(makeDayPath(day, "solution.ts?v=" + n));
 
-        const demo1 = await solve1(demoInput);
-        const demo2 = await solve2(demoInput);
-        let result1 = demo1;
-        let result2 = demo2;
+        try {
 
-        if (compare(demoSolutions[0], demo1)) {
-            result1 = await solve1(actualInput);
-            actual1 = true;
+            const demo1 = await solve1(demoInput);
+            const demo2 = await solve2(demoInput);
+            let result1 = demo1;
+            let result2 = demo2;
+
+            if (compare(demoSolutions[0], demo1)) {
+                result1 = await solve1(actualInput);
+                actual1 = true;
+            }
+
+            if (compare(demoSolutions[1], demo2)) {
+                result2 = await solve2(actualInput);
+                actual2 = true;
+            }
+
+            console.log("Puzzle 1:", result1, actual1 ? `(actual) - ${demo1} (demo)` : `(demo)`);
+            console.log("Puzzle 2:", result2, actual2 ? `(actual) - ${demo2} (demo)` : "(demo)");
+            console.groupEnd();
+
+        } catch (e) {
+            console.error("ERROR RUNNING SOLUTION");
+            console.log(e);
+            console.groupEnd();
         }
-
-        if (compare(demoSolutions[1], demo2)) {
-            result2 = await solve2(actualInput);
-            actual2 = true;
-        }
-
-        console.group(`Day ${day}`);
-        console.log("Puzzle 1:", result1, actual1 ? `(actual) - ${demo1} (demo)` : `(demo)`);
-        console.log("Puzzle 2:", result2, actual2 ? `(actual) - ${demo2} (demo)` : "(demo)");
-        console.groupEnd();
 
     }, 1000);
 
