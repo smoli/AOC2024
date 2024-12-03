@@ -13,7 +13,7 @@ deno --allow-read --allow-write main.ts c <DayNumber>
 ## Run a solution
 
 ```shell
-deno --allow-read main.ts c <DayNumber> [<UseActualData>]
+deno --allow-read main.ts r <DayNumber> [<UseActualData>]
 ```
 
 If `UseActualData` is any value, the data from `actual.txt` will be used.
