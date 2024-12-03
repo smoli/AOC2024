@@ -87,8 +87,8 @@ async function watch(day: number, actual: boolean) {
         }
 
         console.group(`Day ${day}`);
-        console.log("Puzzle 1:", result1, actual1 ? "(actual)" : "(demo)");
-        console.log("Puzzle 2:", result2, actual2 ? "(actual)" : "(demo)");
+        console.log("Puzzle 1:", result1, actual1 ? `(actual) - ${demo1} (demo)` : `(demo)`);
+        console.log("Puzzle 2:", result2, actual2 ? `(actual) - ${demo2} (demo)` : "(demo)");
         console.groupEnd();
 
     }, 1000);
