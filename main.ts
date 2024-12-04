@@ -6,6 +6,7 @@ import {create} from "./src/create.ts";
 import {fetchAndStoreInput} from "./src/fetchAndStoreInput.ts";
 import {year} from "./src/year.ts";
 import {runAll} from "./src/runAll.ts";
+import {fetchAndStoreAllInputs} from "./src/fetchAndStoreAllInputs.ts";
 
 
 function title() {
@@ -62,6 +63,10 @@ if (argv.length < 3) {
 
         case "i":
             await fetchAndStoreInput(day);
+            break;
+
+        case "j":
+            await fetchAndStoreAllInputs();
             break;
 
 

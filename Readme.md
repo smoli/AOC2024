@@ -30,7 +30,7 @@ session=<YOUR SESSION COOKIE-VALUE HERE>
 **Remember to update your `.env`-file everytime you log into AoC.**
 
 
-## Reload input
+## Fetching inputs
 
 ```shell
 deno task input <DayNumber>
@@ -39,6 +39,14 @@ deno task input <DayNumber>
 Fetches the input data for the given file and puts it into the respective folder.
 This is especially useful after cloning this repo, since we do not store the input
 data in the repos, just as Eric requested.
+
+You can (re)fetch all inputs for all days present in the folder.
+
+```shell
+deno task allinputs
+```
+
+Remember to set the session cookie info in `.env` to fetch data.
 
 ## Watch a solution
 

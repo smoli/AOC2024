@@ -4,6 +4,7 @@
     "new": "deno -R -W -E -N main.ts c",
     "run": "deno -R -E main.ts r",
     "runall": "deno -R -E main.ts a",
-    "input": "deno -R -W -E -N main.ts i"
+    "input": "deno -R -W -E -N main.ts i",
+    "allinputs": "deno -R -W -E -N main.ts j"
   }
 }
