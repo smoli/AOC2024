@@ -1,0 +1,7 @@
+{
+  "tasks": {
+    "watch": "deno -R -E main.ts w",
+    "new": "deno -R -W -E main.ts c",
+    "run": "deno -R -E main.ts r"
+  }
+}

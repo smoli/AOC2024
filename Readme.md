@@ -6,7 +6,7 @@ Advent of Code 2024
 Create a new folder for the day with the necessary files.
 
 ```shell
-deno --allow-read --allow-write main.ts c <DayNumber>
+deno task new <DayNumber>
 ```
 
 This will create the following files:
@@ -21,7 +21,7 @@ This will create the following files:
 ## Watch a solution
 
 ```shell
-deno --allow-read main.ts w <DayNumber>
+deno task watch <DayNumber>
 ```
 
 Watches for file changes in the days directory and reruns the tests.
@@ -52,10 +52,10 @@ Rerunning Day 4
 ## Run a solution
 
 ```shell
-deno --allow-read main.ts r <DayNumber> [<UseActualData>]
+deno task run <DAY> [<ACTUAL>]
 ```
 
-If `UseActualData` is any value, the data from `actual.txt` will be used.
+If `ACTUAL` is any value, the data from `actual.txt` will be used.
 
 ## Unit testing
 
