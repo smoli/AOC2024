@@ -58,7 +58,6 @@ export async function solve1(fileName: string): any {
     acc = acc + " " + rev.join("");
 
     const m = acc.match(/XMAS/gm);
-
     return m.length;
 }
 
