@@ -71,9 +71,9 @@ Rerunning Day ${day}
         let actual2 = false;
 
         const n = Math.floor(Math.random() * 1000000000);
-        const {solve1, solve2} = await import(makeDayPath(day, "solution.ts?v=" + n));
 
         try {
+            const {solve1, solve2} = await import(makeDayPath(day, "solution.ts?v=" + n));
 
             const demo1 = await solve1(demoInput);
             const demo2 = await solve2(demoInput);
