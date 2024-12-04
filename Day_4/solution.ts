@@ -3,113 +3,6 @@ import {traverse} from "./traverse.ts";
 import {getWindow} from "./getWindow.ts";
 
 
-export async function solveX(fileName: string): any {
-    let data = await readFileAsLineArray(fileName);
-
-    let count = 0;
-
-    let acc = "";
-
-    const loadAcc = (c: string, x: number, y: number) => {
-        acc += c;
-
-        if (acc.substring(acc.length - 4) === "XMAS") {
-            count++;
-        }
-    }
-
-    const w = data[0].length;
-    const h = data.length;
-
-    // Horizontal
-    let y = h;
-    while (y--) {
-        traverse(data, 0, y, 1, 0, loadAcc)
-        acc = "";
-
-        traverse(data, w - 1, y, -1, 0, loadAcc)
-        acc = "";
-    }
-
-    // Vertical
-    let x = w;
-    while (x--) {
-        traverse(data, x, 0, 0, 1, loadAcc)
-        acc = "";
-
-        traverse(data, x, h - 1, 0, -1, loadAcc)
-        acc = "";
-    }
-
-    // TL to BR
-    y = 0;
-    while (y < h) {
-        x = 0;
-        if (y === 0) {
-            while (x < w) {
-                traverse(data, x, y, 1, 1, loadAcc);
-                acc = "";
-                x++;
-            }
-        }
-        traverse(data, x, y, 1, 1, loadAcc);
-        acc = "";
-        y++;
-    }
-
-   // BR to TL
-    y = h - 1;
-    while (y >= 0) {
-        x = w - 1;
-        if (y === h - 1) {
-            while (x >= 0) {
-                traverse(data, x, y, -1, -1, loadAcc);
-                acc = "";
-                x--;
-            }
-        }
-        traverse(data, x, y, 1, 1, loadAcc);
-        acc = "";
-        y--;
-    }
-
-
-    // TR to BL
-    y = 0;
-    while (y < h) {
-        x = w - 1;
-        if (y === 0) {
-            while (x >= 0) {
-                traverse(data, x, y, -1, 1, loadAcc);
-                acc = "";
-                x--;
-            }
-        }
-        traverse(data, x, y, -1, 1, loadAcc);
-        acc = "";
-        y++;
-    }
-
-
-    // BL to TR
-    y = h - 1;
-    while (y >= 0) {
-        x = 0;
-        if (y === h - 1) {
-            while (x < w) {
-                traverse(data, x, y, 1, -1, loadAcc);
-                acc = "";
-                x++;
-            }
-        }
-        traverse(data, x, y, 1, -1, loadAcc);
-        acc = "";
-        y--;
-    }
-
-    return count;
-
-}
 export async function solve1(fileName: string): any {
     let data = await readFileAsLineArray(fileName);
 
@@ -124,6 +17,29 @@ export async function solve1(fileName: string): any {
     const w = data[0].length;
     const h = data.length;
 
+
+    const diagonal = (sx, sy, dx, dy) => {
+        let y = sy;
+
+        for (let i = 0; i < h; i++) {
+
+            let x = sx;
+
+            if (y === sy) {
+                for (let j = 0; j < w; j++) {
+                    traverse(data, x, y, dx, dy, loadAcc);
+                    acc += " ";
+                    x += dx;
+                }
+            }
+            traverse(data, x, y, dx, dy, loadAcc);
+            acc += " ";
+
+            y += dy;
+        }
+
+    }
+
     // Horizontal
     let y = h;
     while (y--) {
@@ -133,46 +49,16 @@ export async function solve1(fileName: string): any {
     }
 
     // Vertical
-
     let x = w;
     while (x--) {
         traverse(data, x, 0, 0, 1, loadAcc)
         acc += " ";
     }
 
-    // TL to BR
-    y = 0;
-    while (y < h) {
-        x = 0;
-        if (y === 0) {
-            while (x < w) {
-                traverse(data, x, y, 1, 1, loadAcc);
-                acc += " ";
-                x++;
-            }
-        }
-        traverse(data, x, y, 1, 1, loadAcc);
-        acc += " ";
-        y++;
-    }
+    diagonal(0, 0, 1, 1);
+    diagonal(w - 1, 0, -1, 1);
 
-
-    // TR to BL
-    y = 0;
-    while (y < h) {
-        x = w - 1;
-        if (y === 0) {
-            while (x >= 0) {
-                traverse(data, x, y, -1, 1, loadAcc);
-                acc += " ";
-                x--;
-            }
-        }
-        traverse(data, x, y, -1, 1, loadAcc);
-        acc += " ";
-        y++;
-    }
-
+    // Reverse everything
     const rev = acc.split("");
     rev.reverse();
 
