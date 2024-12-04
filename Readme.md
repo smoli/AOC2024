@@ -20,7 +20,7 @@ This will create the following files:
 ### Automatically download input
 
 You can create an `.env`-file in the root directory and put you login session cookie
-from the AoC-Website in there. If the cookie is present, the tool will automaticall download
+from the AoC-Website in there. If the cookie is present, the tool will automatically download
 the input data and put it in the `actual.txt`-file.
 
 ```
