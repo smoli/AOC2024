@@ -30,6 +30,16 @@ session=<YOUR SESSION COOKIE-VALUE HERE>
 **Remember to update your `.env`-file everytime you log into AoC.**
 
 
+## Reload input
+
+```shell
+deno task input <DayNumber>
+```
+
+Fetches the input data for the given file and puts it into the respective folder.
+This is especially useful after cloning this repo, since we do not store the input
+data in the repos, just as Eric requested.
+
 ## Watch a solution
 
 ```shell
@@ -64,10 +74,9 @@ Rerunning Day 4
 ## Run a solution
 
 ```shell
-deno task run <DAY> [<ACTUAL>]
+deno task run <DAY>
 ```
 
-If `ACTUAL` is any value, the data from `actual.txt` will be used.
 
 ## Unit testing
 
