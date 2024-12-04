@@ -17,6 +17,18 @@ This will create the following files:
 * solution.test.ts - you can put unit tests here
 * solutions.ts - your solution. Implement the two functions `solve1` and `solve2`.
 
+### Automatically download input
+
+You can create an `.env`-file in the root directory and put you login session cookie
+from the AoC-Website in there. If the cookie is present, the tool will automaticall download
+the input data and put it in the `actual.txt`-file.
+
+```
+session=<YOUR SESSION COOKIE-VALUE HERE>
+```
+
+**Remember to update your `.env`-file everytime you log into AoC.**
+
 
 ## Watch a solution
 
