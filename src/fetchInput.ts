@@ -1,3 +1,5 @@
+import {year} from "./year.ts";
+
 export async function fetchInput(day: number): Promise<string> {
 
     if (!Deno.env.get("session")) {
@@ -14,7 +16,12 @@ export async function fetchInput(day: number): Promise<string> {
     });
 
     if (r.status === 200) {
-        return await r.text();
+        let text = await r.text();
+
+        text = text.replace(/(.*)\n*$/, "$1");
+
+        return text;
+
     } else {
         console.log(r);
         console.log(await r.text());
