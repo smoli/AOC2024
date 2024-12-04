@@ -5,24 +5,19 @@ import {getWindow} from "./getWindow.ts";
 
 export async function solve1(fileName: string): any {
     let data = await readFileAsLineArray(fileName);
-
-    let count = 0;
-
     let acc = "";
+
+    const w = data[0].length;
+    const h = data.length;
 
     const loadAcc = (c: string, x: number, y: number) => {
         acc += c;
     }
 
-    const w = data[0].length;
-    const h = data.length;
-
-
     const diagonal = (sx, sy, dx, dy) => {
         let y = sy;
 
         for (let i = 0; i < h; i++) {
-
             let x = sx;
 
             if (y === sy) {
@@ -34,10 +29,8 @@ export async function solve1(fileName: string): any {
             }
             traverse(data, x, y, dx, dy, loadAcc);
             acc += " ";
-
             y += dy;
         }
-
     }
 
     // Horizontal
