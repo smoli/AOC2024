@@ -77,6 +77,11 @@ Rerunning Day 4
 deno task run <DAY>
 ```
 
+## Run all solutions
+
+```shell
+deno task runall
+```
 
 ## Unit testing
 

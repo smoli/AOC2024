@@ -3,6 +3,7 @@
     "watch": "deno -R -E main.ts w",
     "new": "deno -R -W -E -N main.ts c",
     "run": "deno -R -E main.ts r",
+    "runall": "deno -R -E main.ts a",
     "input": "deno -R -W -E -N main.ts i"
   }
 }
