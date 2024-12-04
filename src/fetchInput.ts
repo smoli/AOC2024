@@ -9,7 +9,7 @@ export async function fetchInput(day: number): Promise<string> {
 
     headers.append("cookie", cookies.map(c => `${c}=${Deno.env.get(c)}`).join(";"));
 
-    const r = await fetch(`https://adventofcode.com/2024/day/${day}/input`, {
+    const r = await fetch(`https://adventofcode.com/${year()}/day/${day}/input`, {
         headers
     });
 

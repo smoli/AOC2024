@@ -4,11 +4,13 @@ import {run} from "./src/run.ts";
 import {watch} from "./src/watch.ts";
 import {create} from "./src/create.ts";
 import {fetchAndStoreInput} from "./src/fetchAndStoreInput.ts";
+import {year} from "./src/year.ts";
 
 
 function title() {
     console.log();
-    console.log("AOC 2024 - Overengineered tool to do advent of code.");
+    console.log("AOC - Overengineered tool to do advent of code.");
+    console.log("\trunning for", year());
     console.log("\tby Stephan Smola, 2024");
     console.log();
 }
