@@ -15,7 +15,7 @@ This will create the following files:
 * demo.txt - put the demo input from the puzzle description here
 * demoSolutions.txt - put the results for the demo inputs from the puzzle description here. One line for each solutiuon for the demo input
 * solution.test.ts - you can put unit tests here
-* solutions.ts - you solution. Implement the two functions `solve1` and `solve2`.
+* solutions.ts - your solution. Implement the two functions `solve1` and `solve2`.
 
 
 ## Watch a solution
