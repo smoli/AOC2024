@@ -11,32 +11,12 @@ function makeDayPath(day: number, file: string): string {
     return `${makeDayFolderName(day)}/${file}`
 }
 
-
-async function runSolutionForDay(day: number, actual: boolean): Promise<{ a: any, b: any }> {
-
-    const input = actual ? "actual.txt" : "demo.txt";
-
-    const r = {a: 0, b: 0}
-
-    try {
-        const n = Math.floor(Math.random() * 1000000000);
-        const {solve1, solve2} = await import(makeDayPath(day, "solution.ts?v=" + n));
-        r.a = await solve1(makeDayPath(day, input));
-        r.b = await solve2(makeDayPath(day, input));
-
-    } catch (e) {
-        console.log(e)
-    }
-
-    return r;
-}
-
 async function run(day: number, actual: boolean) {
-    const result = await runSolutionForDay(day, actual);
+    const inputs = await getInputsForDay(day);
+    const result = await runSolutions(day, inputs);
 
     console.group(`Day ${day}`);
-    console.log("Puzzle 1: ", result.a);
-    console.log("Puzzle 2: ", result.b);
+    printRes(result);
     console.groupEnd();
 }
 
@@ -51,14 +31,77 @@ function compare(a: any, b: any): boolean {
     }
 }
 
-async function watch(day: number, actual: boolean) {
-    const folder = makeDayFolderName(day);
 
+interface IRunResult {
+    actual1: boolean;
+    actual2: boolean;
+    result1: any;
+    result2: any;
+    demo1: any;
+    demo2: any;
+}
+
+async function runSolutions(day: number, inputs: IInputs): Promise<IRunResult> {
+    let actual1 = false;
+    let actual2 = false;
+
+    const n = Math.floor(Math.random() * 1000000000);
+
+    try {
+        const {solve1, solve2} = await import(makeDayPath(day, "solution.ts?v=" + n));
+
+        const demo1 = await solve1(inputs.demoInput);
+        const demo2 = await solve2(inputs.demoInput);
+        let result1 = demo1;
+        let result2 = demo2;
+
+        if (compare(inputs.demoSolutions[0], demo1)) {
+            result1 = await solve1(inputs.actualInput);
+            actual1 = true;
+        }
+
+        if (compare(inputs.demoSolutions[1], demo2)) {
+            result2 = await solve2(inputs.actualInput);
+            actual2 = true;
+        }
+
+        return {
+            actual1, actual2, demo1, demo2, result1, result2
+        }
+    } catch (e) {
+        console.error("ERROR RUNNING SOLUTION");
+        console.log(e);
+        console.groupEnd();
+    }
+}
+
+
+interface IInputs {
+    demoSolutions: string[],
+    demoInput: string,
+    actualInput: string
+}
+
+async function getInputsForDay(day: number): Promise<IInputs> {
     const demoSolutionsFile = makeDayPath(day, "demoSolutions.txt");
     const demoSolutions = (await readFileAsLineArray(demoSolutionsFile));
 
     const demoInput = makeDayPath(day, "demo.txt");
     const actualInput = makeDayPath(day, "actual.txt");
+
+    return { demoSolutions, demoInput, actualInput }
+}
+
+function printRes(res: IRunResult) {
+    console.log("Puzzle 1:", res.result1, res.actual1 ? `(actual) - ${res.demo1} (demo)` : `(demo)`);
+    console.log("Puzzle 2:", res.result2, res.actual2 ? `(actual) - ${res.demo2} (demo)` : "(demo)");
+}
+
+
+async function watch(day: number, actual: boolean) {
+    const folder = makeDayFolderName(day);
+
+    const inputs = await getInputsForDay(day);
 
     const watcher = Deno.watchFs(folder);
 
@@ -67,40 +110,10 @@ async function watch(day: number, actual: boolean) {
 Rerunning Day ${day}
 ===================================================================================
 `);
+            const res = await runSolutions(day, inputs);
+            printRes(res);
 
-        let actual1 = false;
-        let actual2 = false;
-
-        const n = Math.floor(Math.random() * 1000000000);
-
-        try {
-            const {solve1, solve2} = await import(makeDayPath(day, "solution.ts?v=" + n));
-
-            const demo1 = await solve1(demoInput);
-            const demo2 = await solve2(demoInput);
-            let result1 = demo1;
-            let result2 = demo2;
-
-            if (compare(demoSolutions[0], demo1)) {
-                result1 = await solve1(actualInput);
-                actual1 = true;
-            }
-
-            if (compare(demoSolutions[1], demo2)) {
-                result2 = await solve2(actualInput);
-                actual2 = true;
-            }
-
-            console.log("Puzzle 1:", result1, actual1 ? `(actual) - ${demo1} (demo)` : `(demo)`);
-            console.log("Puzzle 2:", result2, actual2 ? `(actual) - ${demo2} (demo)` : "(demo)");
             console.groupEnd();
-
-        } catch (e) {
-            console.error("ERROR RUNNING SOLUTION");
-            console.log(e);
-            console.groupEnd();
-        }
-
     }, 1000);
 
 
@@ -162,7 +175,7 @@ async function create(day: number) {
         const input = await getInput(day);
 
         if (input) {
-            await Deno.writeTextFile(makeDayPath(day, "actual.txt"), input, { create: true });
+            await Deno.writeTextFile(makeDayPath(day, "actual.txt"), input, {create: true});
             files = files.filter(f => f !== "actual.txt");
         }
     } catch (e) {
@@ -173,8 +186,6 @@ async function create(day: number) {
     for (const file of files) {
         await Deno.copyFile(`./template/${file}`, makeDayPath(day, file));
     }
-
-
 }
 
 
@@ -184,8 +195,8 @@ function help() {
     console.group("Commands:");
     console.log();
     console.log("c N\tcreate a new solution template for day N");
-    console.log("r N (A)\trun solution for day N. If A is given any value the actual data will be used. Demo otherwise");
-    console.log("w N (A)\trun solution for day N everytime one of the files in the respective folder changes.");
+    console.log("r N\trun solution for day N.");
+    console.log("w N\trun solution for day N everytime one of the files in the respective folder changes.");
     console.log();
 }
 
@@ -194,7 +205,6 @@ if (argv.length < 4) {
 } else {
     const command = argv[2];
     const day = Number(argv[3]);
-    const actual = !!argv[4];
 
     switch (command) {
 
@@ -207,13 +217,13 @@ if (argv.length < 4) {
         case "r":
         case "R":
         case "run":
-            await run(day, actual);
+            await run(day);
             break;
 
         case "w":
         case "W":
         case "watch":
-            await watch(day, actual);
+            await watch(day);
             break;
 
         case "i":
