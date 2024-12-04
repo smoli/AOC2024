@@ -5,6 +5,7 @@ import {watch} from "./src/watch.ts";
 import {create} from "./src/create.ts";
 import {fetchAndStoreInput} from "./src/fetchAndStoreInput.ts";
 import {year} from "./src/year.ts";
+import {runAll} from "./src/runAll.ts";
 
 
 function title() {
@@ -27,7 +28,7 @@ function help() {
 
 title();
 
-if (argv.length < 4) {
+if (argv.length < 3) {
     help();
 } else {
     const command = argv[2];
@@ -47,6 +48,12 @@ if (argv.length < 4) {
             await run(day);
             break;
 
+        case "a":
+        case "A":
+        case "runall":
+            await runAll();
+            break;
+
         case "w":
         case "W":
         case "watch":
@@ -59,7 +66,7 @@ if (argv.length < 4) {
 
 
         default:
-            console.error("Unrecognized command", command);
+            console.log("Unrecognized command", command);
             help();
     }
 

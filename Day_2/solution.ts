@@ -26,8 +26,6 @@ export async function solve2(fileName: string): any {
 
     const safe = data.map(l => [l, isSafeDamped(l)]);
 
-
-    console.table(safe.filter(s => s[1] === false));
     return safe.filter(s => s[1]).length;
 }
 
