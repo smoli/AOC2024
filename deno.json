@@ -2,6 +2,7 @@
   "tasks": {
     "watch": "deno -R -E main.ts w",
     "new": "deno -R -W -E -N main.ts c",
-    "run": "deno -R -E main.ts r"
+    "run": "deno -R -E main.ts r",
+    "input": "deno -R -W -E -N main.ts i"
   }
 }

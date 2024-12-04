@@ -1,21 +1,29 @@
 import {argv} from "node:process";
 import "jsr:@std/dotenv/load";
-import {fetchInput} from "./src/fetchInput.ts";
 import {run} from "./src/run.ts";
 import {watch} from "./src/watch.ts";
 import {create} from "./src/create.ts";
+import {fetchAndStoreInput} from "./src/fetchAndStoreInput.ts";
 
+
+function title() {
+    console.log();
+    console.log("AOC 2024 - Overengineered tool to do advent of code.");
+    console.log("\tby Stephan Smola, 2024");
+    console.log();
+}
 
 function help() {
-    console.group("AOC 2024 - Usage");
-    console.log();
     console.group("Commands:");
     console.log();
     console.log("c N\tcreate a new solution template for day N");
     console.log("r N\trun solution for day N.");
     console.log("w N\trun solution for day N everytime one of the files in the respective folder changes.");
+    console.log("i N\ttry to load input data for day. Make sure to provide session cookie in .env-file.");
     console.log();
 }
+
+title();
 
 if (argv.length < 4) {
     help();
@@ -44,12 +52,14 @@ if (argv.length < 4) {
             break;
 
         case "i":
-            console.log(await fetchInput(day));
+            await fetchAndStoreInput(day);
             break;
 
 
         default:
-            console.error("ERROR: Unknown command", command);
+            console.error("Unrecognized command", command);
             help();
     }
+
+    console.log();
 }
