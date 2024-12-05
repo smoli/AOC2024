@@ -11,21 +11,35 @@ export async function runSolutions(day: number, inputs: IInputs): Promise<IRunRe
 
     const n = Math.floor(Math.random() * 1000000000);
 
-    try {
-        const {solve1, solve2} = await import(path.join("..", makeDayPath(day, "solution.ts?v=" + n)));
+    let module = {};
 
-        const demo1 = await solve1(inputs.demoInput);
-        const demo2 = await solve2(inputs.demoInput);
+    try {
+        module = await import(path.join("..", makeDayPath(day, "solution.ts?v=" + n)));
+    } catch (e) {
+        console.error("ERROR LOADING SOLUTION")
+        console.log(e);
+        console.groupEnd();
+        return {};
+    }
+
+    if (!module) {
+        return {}
+    }
+
+    try {
+        const demo1 = await module.solve1(inputs.demoInput);
+        const demo2 = await module.solve2(inputs.demoInput);
+
         let result1 = demo1;
         let result2 = demo2;
 
         if (compare(inputs.demoSolutions[0], demo1)) {
-            result1 = await solve1(inputs.actualInput);
+            result1 = await module.solve1(inputs.actualInput);
             actual1 = true;
         }
 
         if (compare(inputs.demoSolutions[1], demo2)) {
-            result2 = await solve2(inputs.actualInput);
+            result2 = await module.solve2(inputs.actualInput);
             actual2 = true;
         }
 
