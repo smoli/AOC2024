@@ -128,13 +128,11 @@ export async function solve1(fileName: string): any {
 
     const data = raw.map(s => s.split(""));
 
-    let steps = 0;
     let guard = findGuard(data);
 
 
     while (!outside(data, guard)) {
         markMapAt(data, guard.x, guard.y)
-        steps++;
         guard = step(data, guard);
     }
 
