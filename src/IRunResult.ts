@@ -5,4 +5,8 @@ export interface IRunResult {
     result2: any;
     demo1: any;
     demo2: any;
+    s1: number;
+    e1: number;
+    s2: number;
+    e2: number;
 }
