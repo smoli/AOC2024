@@ -99,17 +99,14 @@ function step(data: string[][], guard: IGuard): IGuard {
         return future;
     }
 
-    const m = getMapAt(data, guard.x + guard.dx, guard.y + guard.dy);
+    const m = getMapAt(data, future.x, future.y);
 
     if (m === OBSTACLE) {
         nextGuard = turn(nextGuard);
         return step(data, nextGuard);
     }
 
-    nextGuard.x += nextGuard.dx;
-    nextGuard.y += nextGuard.dy;
-
-    return nextGuard;
+    return getFutureGuard(nextGuard);
 }
 
 function outside(data: string[][], guard: IGuard, offset: number = 0): boolean {
