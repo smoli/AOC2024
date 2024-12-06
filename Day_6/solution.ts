@@ -100,7 +100,7 @@ function step(data: string[][], guard: IGuard): IGuard {
 
     const m = getMapAt(data, guard.x + guard.dx, guard.y + guard.dy);
 
-    if (m !== EMPTY && m !== MARK) {
+    if (m === OBSTACLE) {
         ng = turn(ng);
         return step(data, ng);
     }
@@ -111,8 +111,8 @@ function step(data: string[][], guard: IGuard): IGuard {
     return ng;
 }
 
-function outside(data: string[][], guard: IGuard): boolean {
-    return guard.x < 0 || guard.y < 0 || guard.x >= data[0].length || guard.y >= data.length;
+function outside(data: string[][], guard: IGuard, offset: number = 0): boolean {
+    return guard.x < 0 - offset || guard.y < 0 - offset || guard.x >= data[0].length + offset || guard.y >= data.length + offset;
 
 }
 
@@ -139,9 +139,97 @@ export async function solve1(fileName: string): any {
     return countMarks(data);
 }
 
+const OBSTACLE = "#";
+
+function leadsToObstacle(data: string[][], trail: IGuard[][][], guard: IGuard, debug: boolean = false): boolean {
+
+    let future = getFutureGuard(guard);
+
+    while (!outside(data, future)) {
+        if (getMapAt(data, future.x, future.y) === OBSTACLE) {
+            return true;
+        }
+
+        future = getFutureGuard(future);
+    }
+
+    return false;
+}
+
+function runsOut(data: string[][], newObstacle: IGuard, guard: IGuard) {
+    const secondMap = data.map(d => d.map(d => d));
+
+    secondMap[newObstacle.y][newObstacle.x] = OBSTACLE;
+
+    const trail: IGuard[][][] = data.map(d => d.map(() => new Array(0)));
+
+
+    let localGuard = {...guard};
+
+    while (!outside(secondMap, localGuard)) {
+        markMapAt(secondMap, localGuard.x, localGuard.y);
+
+        const o = trail[localGuard.y][localGuard.x];
+
+        if (o.find(o => o.dx === localGuard.dx && o.dy === localGuard.dy)) {
+            // Walked this path before in this direction
+            return false;
+        }
+
+        o.push(localGuard);
+        localGuard = step(secondMap, localGuard);
+    }
+
+    return true;
+}
+
+
+function pad(data: string[][]): string[][] {
+    const r = data.map(d => d.map(d => d));
+
+    for (const line of r) {
+        line.unshift(EMPTY);
+        line.push(EMPTY);
+    }
+
+    r.unshift(r[0].map(r => EMPTY));
+    r.push(r[0].map(r => EMPTY));
+
+    return r;
+}
+
+
 
 export async function solve2(fileName: string): any {
-    let data = await readFileAsLineArray(fileName);
+    let raw = await readFileAsLineArray(fileName);
 
-    /* Whatever needs to be done here to solve the first puzzle. Return the result */
+    const data = pad(raw.map(s => s.split("")), 1);
+
+    let guard = findGuard(data);
+    let start = {...guard};
+    let loops: IGuard[] = [];
+
+    while (!outside(data, guard)) {
+
+        let newObstacle = getFutureGuard(guard);
+
+        if (!outside(data, newObstacle)) {
+            const m = getMapAt(data, newObstacle.x, newObstacle.y);
+            if (m === EMPTY || m === MARK) {
+                let deviated = turn(guard);
+
+                if ((newObstacle.x !== start.x
+                    || newObstacle.y !== start.y) && !runsOut(data, newObstacle, deviated)) {
+                    if (!loops.find(l => l.x === newObstacle.x && l.y === newObstacle.y)) {
+                        loops.push(newObstacle);
+                    }
+                }
+            }
+        }
+
+        markMapAt(data, guard.x, guard.y)
+        guard = step(data, guard);
+    }
+
+    return loops.length;
 }
