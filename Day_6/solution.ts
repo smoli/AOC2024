@@ -1,8 +1,9 @@
 import {readFileAsLineArray} from "../common/readFileAsLineArray.ts";
 
-
 const EMPTY = ".";
 const MARK = "X";
+const OBSTACLE = "#";
+
 
 interface IGuard {
     x: number,
@@ -91,9 +92,9 @@ function getFutureGuard(guard: IGuard): IGuard {
 }
 
 function step(data: string[][], guard: IGuard): IGuard {
-    let ng: IGuard = {...guard};
+    let nextGuard: IGuard = {...guard};
 
-    const future = getFutureGuard(ng)
+    const future = getFutureGuard(nextGuard)
     if (outside(data, future)) {
         return future;
     }
@@ -101,14 +102,14 @@ function step(data: string[][], guard: IGuard): IGuard {
     const m = getMapAt(data, guard.x + guard.dx, guard.y + guard.dy);
 
     if (m === OBSTACLE) {
-        ng = turn(ng);
-        return step(data, ng);
+        nextGuard = turn(nextGuard);
+        return step(data, nextGuard);
     }
 
-    ng.x += ng.dx;
-    ng.y += ng.dy;
+    nextGuard.x += nextGuard.dx;
+    nextGuard.y += nextGuard.dy;
 
-    return ng;
+    return nextGuard;
 }
 
 function outside(data: string[][], guard: IGuard, offset: number = 0): boolean {
@@ -117,57 +118,24 @@ function outside(data: string[][], guard: IGuard, offset: number = 0): boolean {
 }
 
 function countMarks(data: string[][]): number {
-    const conc = data.map(d => d.join("")).join("");
+    const concatenation = data.map(d => d.join("")).join("");
 
-    return conc.match(/X/g).length;
+    return concatenation.match(/X/g).length;
 }
 
 
-export async function solve1(fileName: string): any {
-    let raw = await readFileAsLineArray(fileName);
+function runsOut(map: string[][], newObstacle: IGuard, guard: IGuard) {
+    const localMap = map.map(d => d.map(d => d));
 
-    const data = raw.map(s => s.split(""));
+    localMap[newObstacle.y][newObstacle.x] = OBSTACLE;
 
-    let guard = findGuard(data);
-
-
-    while (!outside(data, guard)) {
-        markMapAt(data, guard.x, guard.y)
-        guard = step(data, guard);
-    }
-
-    return countMarks(data);
-}
-
-const OBSTACLE = "#";
-
-function leadsToObstacle(data: string[][], trail: IGuard[][][], guard: IGuard, debug: boolean = false): boolean {
-
-    let future = getFutureGuard(guard);
-
-    while (!outside(data, future)) {
-        if (getMapAt(data, future.x, future.y) === OBSTACLE) {
-            return true;
-        }
-
-        future = getFutureGuard(future);
-    }
-
-    return false;
-}
-
-function runsOut(data: string[][], newObstacle: IGuard, guard: IGuard) {
-    const secondMap = data.map(d => d.map(d => d));
-
-    secondMap[newObstacle.y][newObstacle.x] = OBSTACLE;
-
-    const trail: IGuard[][][] = data.map(d => d.map(() => new Array(0)));
+    const trail: IGuard[][][] = map.map(d => d.map(() => new Array(0)));
 
 
     let localGuard = {...guard};
 
-    while (!outside(secondMap, localGuard)) {
-        markMapAt(secondMap, localGuard.x, localGuard.y);
+    while (!outside(localMap, localGuard)) {
+        markMapAt(localMap, localGuard.x, localGuard.y);
 
         const o = trail[localGuard.y][localGuard.x];
 
@@ -177,7 +145,7 @@ function runsOut(data: string[][], newObstacle: IGuard, guard: IGuard) {
         }
 
         o.push(localGuard);
-        localGuard = step(secondMap, localGuard);
+        localGuard = step(localMap, localGuard);
     }
 
     return true;
@@ -200,6 +168,24 @@ function pad(data: string[][]): string[][] {
 
 
 
+
+export async function solve1(fileName: string): any {
+    let raw = await readFileAsLineArray(fileName);
+
+    const data = raw.map(s => s.split(""));
+
+    let guard = findGuard(data);
+
+    while (!outside(data, guard)) {
+        markMapAt(data, guard.x, guard.y)
+        guard = step(data, guard);
+    }
+
+    return countMarks(data);
+}
+
+
+
 export async function solve2(fileName: string): any {
     let raw = await readFileAsLineArray(fileName);
 
@@ -218,8 +204,8 @@ export async function solve2(fileName: string): any {
             if (m === EMPTY || m === MARK) {
                 let deviated = turn(guard);
 
-                if ((newObstacle.x !== start.x
-                    || newObstacle.y !== start.y) && !runsOut(data, newObstacle, deviated)) {
+                if ((newObstacle.x !== start.x || newObstacle.y !== start.y) &&
+                    !runsOut(data, newObstacle, deviated)) {
                     if (!loops.find(l => l.x === newObstacle.x && l.y === newObstacle.y)) {
                         loops.push(newObstacle);
                     }
