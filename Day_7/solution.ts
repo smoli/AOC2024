@@ -120,40 +120,6 @@ function cartesian<T>(dimensions: T[][] ): T[][] {
     return ret;
 }
 
-const t: Node = {
-    type: NodeTypes.EQ,
-
-    op1: {
-        type: NodeTypes.NUM,
-        value: 3247
-    },
-
-    op2:
-
-
-
-        {
-            type: NodeTypes.UNKNOWN,
-            op1: {
-                type: NodeTypes.UNKNOWN,
-                op1: {
-                    type: NodeTypes.NUM,
-                    value: 81
-                },
-                op2: {
-                    type: NodeTypes.NUM,
-                    value: 40
-                }
-            },
-            op2: {
-                type: NodeTypes.NUM,
-                value: 27
-            }
-        },
-
-
-}
-
 
 function parse(line: string): { node: Node, unknowns: number, left: number } {
     const [left, right] = line.split((":")).map(s => s.trim());
