@@ -166,12 +166,18 @@ function parse(line: string): { node: Node, unknowns: number, left: number } {
 function solve(data: string[], operations: NodeTypes[]): number {
     let sum = 0;
 
+
+    const combos = {};
+
     for (const line of data) {
         const { left, node, unknowns } = parse(line);
 
-        const dimensions: NodeTypes[][] = new Array(unknowns).fill(operations);
+        if (!combos[unknowns]) {
+            const dimensions: NodeTypes[][] = new Array(unknowns).fill(operations);
+            combos[unknowns] = cartesian(dimensions)
+        }
 
-        const unknownCombos: NodeTypes[][] = cartesian(dimensions);
+        const unknownCombos: NodeTypes[][] = combos[unknowns];
 
         for (const operators of unknownCombos) {
             if (evaluate(node, operators)) {
